@@ -90,15 +90,13 @@ def process_depth_for_obstacles(depth_m, quat, fx, fy, cx, cy,
 
             # Rotate to world
             pt_world = pt_cam
-            obs_points.append(pt_world[1:3])
+            if pt_world[-1] <max_depth : 
+                obs_points.append(pt_world[1:3])
 
     obs_points = np.array(obs_points)
     return depth_filtered, obs_points
 
 
-device = dai.Device()
-intrinsics = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_B)
-intrinsics  = np.array(intrinsics)
 
 def plot_obstacles(obs_points, window_size=(500,500), scale=100):
     """
@@ -124,6 +122,9 @@ def plot_obstacles(obs_points, window_size=(500,500), scale=100):
 
     cv2.imshow("Top-Down Obstacles", topdown)
     cv2.waitKey(1)
+device = dai.Device()
+intrinsics = device.readCalibration().getCameraIntrinsics(dai.CameraBoardSocket.CAM_B)
+intrinsics  = np.array(intrinsics)
 
 with dai.Pipeline(device) as pipeline:
     # ---------- Cameras ----------
