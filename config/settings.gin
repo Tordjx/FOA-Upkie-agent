@@ -1,0 +1,23 @@
+# -*- python -*-
+#
+# SPDX-License-Identifier: Apache-2.0
+
+import config.settings
+
+EnvSettings.agent_frequency = 10
+EnvSettings.env_id = "UpkieServos"
+EnvSettings.spine_config = {
+    "bullet": {
+        "torque_control": {
+            "kd": 0.3,
+            "kp": 400.0
+        },
+    }
+}
+
+EnvSettings.max_episode_duration =20
+EnvSettings.spine_frequency = 1000
+EnvSettings.window = True
+EnvSettings.width = 128
+EnvSettings.height = 128
+EnvSettings.image_every = 1
