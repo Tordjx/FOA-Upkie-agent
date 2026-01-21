@@ -24,8 +24,6 @@ upkie.envs.register()
 gin.parse_config_file(f"config/settings.gin")
 env_settings = EnvSettings()
 
-from env.envs import make_vision_pink_env
-
 gym.envs.registration.register(
     id="UpkieServos-v5", entry_point="env.upkie_servos:UpkieServos"
 )
@@ -88,12 +86,12 @@ env = make_rays_pink_env(
 )
 
 def main():
-    log_file = setup_logger("foa")
-    logging.info(f"Starting run, logging to {log_file}")
+    #log_file = setup_logger("foa")
+    #logging.info(f"Starting run, logging to {log_file}")
     # ZeroMQ publisher setup
-    context = zmq.Context()
-    socket = context.socket(zmq.PUB)
-    socket.bind("tcp://*:8080")  # Change port if needed
+    #context = zmq.Context()
+    #socket = context.socket(zmq.PUB)
+    #socket.bind("tcp://*:8080")  # Change port if needed
 
     rate_limiter = RateLimiter(frequency=10)
     s, i = env.reset()
@@ -103,7 +101,7 @@ def main():
         
         # Send obstacle points
         obstacle_points = i["obstacle_points"]
-        socket.send_pyobj(obstacle_points)  # Publish numpy array (pickled)
+        #socket.send_pyobj(obstacle_points)  # Publish numpy array (pickled)
 
         action = modulate_velocity(reactive_avoidance, i)
         
@@ -115,10 +113,11 @@ def main():
         yaw_velocity = i["spine_observation"]["base_orientation"][
             "angular_velocity"
         ][2]
+        """
         logging.info(
             f"Action={action}, Joystick={joystick_input}, rdot={forward_velocity}, phidot={yaw_velocity} "
             f"ObstaclePoints={obstacle_points}"
-        )
+        )"""
 
 if __name__ == "__main__":
     main()

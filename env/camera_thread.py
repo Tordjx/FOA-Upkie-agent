@@ -93,12 +93,13 @@ def process_depth_for_obstacles(depth_m, quat, fx, fy, cx, cy,
 
 
 class CameraThread:
-    def __init__(self, intrinsics, pipeline, stereoOut, imuQueue, fps=10):
+    def __init__(self, intrinsics, pipeline, stereoOut, imuQueue,device, fps=10):
         """
         camera: your camera interface object, e.g. with .get_image()
         encoder: your encoder object or function
         fps: desired frame rate
         """
+        self.device = device
         self.intrinsics = intrinsics 
         self.pipeline = pipeline 
         self.stereoOut = stereoOut
