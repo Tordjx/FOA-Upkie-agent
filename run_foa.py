@@ -10,7 +10,7 @@ else:
 from tqdm import tqdm
 from foa.foa import ReactiveAvoidance
 import numpy as np
-from foa.envs import make_rays_pink_env
+from env.envs import make_rays_pink_env
 from loop_rate_limiters import RateLimiter
 import gymnasium as gym
 import torch
