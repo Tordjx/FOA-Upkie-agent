@@ -59,22 +59,23 @@ def modulate_velocity(reactive_avoidance, i):
     reference_velocity = np.array([target_forward, target_yaw])
     obstacle_points = i["obstacle_points"]
     modulated_velocity = reactive_avoidance.compute(reference_velocity, obstacle_points)
-    #modulated_velocity[1] *= -1
+    modulated_velocity[1] *= -1
     modulated_velocity = np.linalg.inv(np.diag([1, 0.10])) @ modulated_velocity  # upkie's lever arm
     correction = modulated_velocity - reference_velocity
-    print(modulated_velocity)
+    print(modulated_velocity, obstacle_points)
     return correction
 
 agent_frequency = env_settings.agent_frequency
 max_episode_duration = 25000
-
+spine_config = env_settings.spine_config
+spine_config["base_orientation"]  = {'rotation_base_to_imu':np.array([1,0,0,0,-1,0,0,0,-1],dtype=float)}
 velocity_env = gym.make(
     env_settings.env_id,
     max_episode_steps=int(max_episode_duration * agent_frequency),
     frequency=100,
     regulate_frequency=reg_freq,
     shm_name="upkie",
-    spine_config=env_settings.spine_config,
+    spine_config=spine_config,
     fall_pitch=np.pi / 2,
     init_state=RobotState(position_base_in_world=np.array([2, 2, 0.58]))
 )
