@@ -38,14 +38,16 @@ def create_pipeline():
     stereo.setSubpixel(True)
 
     # ---------- Depth output ----------
-    stereoOut = stereo.depth.createOutputQueue(maxSize=1, blocking=False)  # depth in mm
+    pcl = pipeline.create(dai.node.PointCloud)
+    stereo.depth.link(pcl.inputDepth)
+    pcl_queue = pcl.outputPointCloud.createOutputQueue(maxSize=1, blocking=False)
 
     imu = pipeline.create(dai.node.IMU)
 
     imu.enableIMUSensor(dai.IMUSensor.ROTATION_VECTOR, 480)
 
     imuQueue = imu.out.createOutputQueue(maxSize=1, blocking=False)
-    return intrinsics, pipeline, stereoOut, imuQueue,device
+    return intrinsics, pipeline, pcl_queue, imuQueue
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -53,9 +55,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class RaspiImageWrapper(Wrapper):
     def __init__(self, env, image_every=10):
         super().__init__(env=env)
-        intrinsics, pipeline, stereoOut, imuQueue,device= create_pipeline()
+        intrinsics, pipeline, pcl_queue, imuQueue= create_pipeline()
         self.camera_thread = CameraThread(
-            intrinsics = intrinsics, pipeline = pipeline, stereoOut = stereoOut, imuQueue = imuQueue,device= device, fps=10
+            intrinsics = intrinsics, pipeline = pipeline, pcl_queue = pcl_queue, imuQueue = imuQueue, fps=10
         )
         self.camera_thread.start()
 
