@@ -7,7 +7,7 @@ gin.parse_config_file("config/settings.gin")
 from config.settings import EnvSettings
 
 config = EnvSettings()
-from env.camera_thread import CameraThread
+from foa.camera_thread import CameraThread
 
 
 def create_pipeline():
@@ -36,18 +36,14 @@ def create_pipeline():
     stereo.setExtendedDisparity(False)
     stereo.setLeftRightCheck(True)
     stereo.setSubpixel(True)
-
-    # ---------- Depth output ----------
-    pcl = pipeline.create(dai.node.PointCloud)
-    stereo.depth.link(pcl.inputDepth)
-    pcl_queue = pcl.outputPointCloud.createOutputQueue(maxSize=4, blocking=False)
+    stereo_queue = stereo.depth.createOutputQueue(maxSize=1, blocking=False)
 
     imu = pipeline.create(dai.node.IMU)
 
-    imu.enableIMUSensor(dai.IMUSensor.ROTATION_VECTOR, 480)
+    imu.enableIMUSensor(dai.IMUSensor.ROTATION_VECTOR, 480) #magic number is imu freq
 
     imuQueue = imu.out.createOutputQueue(maxSize=4, blocking=False)
-    return intrinsics, pipeline, pcl_queue, imuQueue,device
+    return intrinsics, pipeline, stereo_queue, imuQueue,device
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -55,9 +51,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class RaspiImageWrapper(Wrapper):
     def __init__(self, env, image_every=10):
         super().__init__(env=env)
-        intrinsics, pipeline, pcl_queue, imuQueue,device= create_pipeline()
+        intrinsics, pipeline, stereo_queue, imuQueue,device= create_pipeline()
         self.camera_thread = CameraThread(
-            intrinsics = intrinsics, pipeline = pipeline, pcl_queue = pcl_queue, imuQueue = imuQueue, device = device,fps=10
+            intrinsics = intrinsics, pipeline = pipeline, stereo_queue = stereo_queue, imuQueue = imuQueue, device = device,fps=10
         )
         self.camera_thread.start()
 
