@@ -45,8 +45,8 @@ class ReactiveAvoidance:
         self.robot.control_point = [0, 0]
 
         # Avoider instance
-        delta = 69 * (np.pi / 180)/20 
-        self.avoider = SampledClusterAvoider(control_radius=self.robot.control_radius,weight_factor = 5*delta, clusterer = MockClusterer(),weight_power= 1)#,cluster_params = {"eps": 2 * control_radius, "min_samples": 3, "n_jobs" : -1})
+        delta = 100 * (np.pi / 180)/30 
+        self.avoider = SampledClusterAvoider(control_radius=self.robot.control_radius,weight_factor = 1*delta, clusterer = MockClusterer(),weight_power= 1)#,cluster_params = {"eps": 2 * control_radius, "min_samples": 3, "n_jobs" : -1})
         self.modulated_velocity = np.zeros(2)
 
     def compute(self, reference_velocity, obstacle_points):
@@ -59,7 +59,7 @@ class ReactiveAvoidance:
         Returns:
         - modulated_velocity: np.array of shape (2,)
         """
-        if obstacle_points.shape[0]<=0:
+        if obstacle_points is None or obstacle_points.shape[0]<=0 :
             print('NO POINTS !!! sending ref vel')
             return reference_velocity
         if obstacle_points.shape[1] == 3 :
@@ -68,7 +68,7 @@ class ReactiveAvoidance:
         self.robot.pose.orientation = 0.0  # Optional: update if orientation is relevant
 
         # Update avoider with obstacle points
-        self.avoider.update_laserscan(obstacle_points.T, in_robot_frame=False)
+        self.avoider.update_laserscan(obstacle_points.T, in_robot_frame=True)
 
         # Modulate the velocity
         try : 

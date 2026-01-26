@@ -4,7 +4,7 @@ from scipy.spatial.transform import Rotation
 
 class RaysProcessor:
     def __init__(self,fovx, fovy, max_depth, N=30, radius=10):
-        self.fovx = fovx
+        self.fovx = 100*np.pi/180#fovx
         self.fovy = fovy
         self.N = N
         self.radius = radius
@@ -20,11 +20,11 @@ class RaysProcessor:
 
         R = Rotation.from_quat(quaternion).as_matrix()
         camera_z_axis = R[:, 2]  # camera's forward vector
-        elevation = np.arcsin(camera_z_axis[2]) - np.pi/2  # vertical angle of optical axis 
+        elevation = -np.arcsin(camera_z_axis[2])  # vertical angle of optical axis 
         print('ELEVATION :',elevation )
 
         pixel_row = int(np.clip(f_y * np.tan(-elevation) + c_y, 0, frame_height - 1))
-
+        print(pixel_row,depth.shape)
         cols = np.linspace(0, frame_width - 1, self.N, dtype=int)
 
         median_depths = []
@@ -42,8 +42,9 @@ class RaysProcessor:
 
     def get_ray_points_local_frame(self, depth , quaternion):
         frame_height, frame_width = depth.shape
+        depth = np.where(depth==0 , self.max_depth, depth/1000)
         median_depths, pixel_row, cols = self.get_rays(depth,quaternion)
-
+        
         fx = frame_width / (2 * np.tan(self.fovx / 2))
         fy = frame_height / (2 * np.tan(self.fovy / 2))
         cx = frame_width / 2
@@ -51,7 +52,7 @@ class RaysProcessor:
 
         points = []
         for u, depth_val in zip(cols, median_depths):
-            if depth_val <= self.max_depth: 
+            if depth_val < self.max_depth: 
                 v = pixel_row
 
                 z_cam = depth_val
@@ -60,8 +61,8 @@ class RaysProcessor:
 
                 # Robot frame: x forward, y left
                 x_robot = z_cam
-                y_robot = x_cam
+                y_robot = -x_cam
 
-                points.append([x_robot, y_robot])
+                points.append([y_robot, x_robot])
 
         return np.array(points)

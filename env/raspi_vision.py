@@ -19,16 +19,15 @@ def create_pipeline():
     # ---------- Cameras ----------
     monoLeft = pipeline.create(dai.node.Camera).build(dai.CameraBoardSocket.CAM_B)
     monoRight = pipeline.create(dai.node.Camera).build(dai.CameraBoardSocket.CAM_C)
-
-    monoLeftOut  = monoLeft.requestFullResolutionOutput(fps=15, type=dai.ImgFrame.Type.GRAY8)
-    monoRightOut = monoRight.requestFullResolutionOutput(fps=15, type=dai.ImgFrame.Type.GRAY8)
+    monoLeftOut  = monoLeft.requestOutput((640, 400), type=dai.ImgFrame.Type.GRAY8, fps = 15)
+    monoRightOut = monoRight.requestOutput((640, 400), type=dai.ImgFrame.Type.GRAY8, fps = 15)
 
     # ---------- Stereo ----------
     stereo = pipeline.create(dai.node.StereoDepth)
     stereo.initialConfig.setDisparityShift(True)
     stereo.initialConfig.costMatching.enableCompanding = True
     
-    stereo.initialConfig.setConfidenceThreshold(250)
+    stereo.initialConfig.setConfidenceThreshold(100)
     monoLeftOut.link(stereo.left)
     monoRightOut.link(stereo.right)
     
