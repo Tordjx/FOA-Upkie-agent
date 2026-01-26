@@ -63,6 +63,6 @@ class RaysProcessor:
                 x_robot = z_cam
                 y_robot = -x_cam
 
-                points.append([y_robot, x_robot])
+                points.append([x_robot, y_robot])
 
         return np.array(points)

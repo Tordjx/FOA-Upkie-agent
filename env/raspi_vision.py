@@ -35,7 +35,7 @@ def create_pipeline():
     stereo.setExtendedDisparity(False)
     stereo.setLeftRightCheck(True)
     stereo.setSubpixel(True)
-    stereo_queue = stereo.depth.createOutputQueue(maxSize=1, blocking=False)
+    stereo_queue = stereo.depth.createOutputQueue(maxSize=4, blocking=False)
 
     imu = pipeline.create(dai.node.IMU)
 
