@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation
 
 class RaysProcessor:
-    def __init__(self,fovx, fovy, max_depth, N=30, radius=10):
+    def __init__(self,fovx, fovy, max_depth, N=30, radius=20):
         self.fovx = 100*np.pi/180#fovx
         self.fovy = fovy
         self.N = N

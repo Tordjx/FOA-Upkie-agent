@@ -67,7 +67,7 @@ class CameraThread:
 
                 fovx = 2 * np.arctan(frame_width / (2 * fx))
                 fovy = 2 * np.arctan(frame_height / (2 * fy))
-                self.rays_processor  = RaysProcessor(fovx, fovy , 1)
+                self.rays_processor  = RaysProcessor(fovx, fovy , 1.5)
             xy = self.rays_processor.get_ray_points_local_frame(depth, quat)
             with self.lock:
                 self.latest_points = xy
